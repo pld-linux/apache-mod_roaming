@@ -1,6 +1,5 @@
-%define 	apxs		/usr/sbin/apxs
 %define		mod_name	roaming
-
+%define 	apxs		/usr/sbin/apxs
 Summary:	Enables Netscape Communicator roaming profiles with Apache
 Summary(cs):	Modul podpory roamingových profilù Netscape Communicatora pro Apache
 Summary(da):	Et apachemodul som lader webtjeneren håndtere profiler for Netscape Communicator
@@ -14,23 +13,23 @@ Summary(pt_BR):	Modulo "Netscape Roaming Access" para o Apache
 Summary(sk):	WWW prehliadaè Netscape Navigator
 Summary(sv):	Möjliggör Netscape Communicator reseprofiler med Apache
 Name:		apache-mod_%{mod_name}
-Version:	1.0.2
-Release:	6
+Version:	2.0.0
+Release:	1
 License:	BSD-like
 Group:		Networking/Daemons
 Source0:	http://www.klomp.org/mod_roaming/mod_%{mod_name}-%{version}.tar.gz
-# Source0-md5:	226c0ce2daf276072079590b5560f022
+# Source0-md5:	ad2d720d7ffd08c4e7f2e6979795237e
 Source1:	%{name}.conf
 URL:		http://www.klomp.org/mod_roaming/
 BuildRequires:	%{apxs}
-BuildRequires:	apache(EAPI)-devel
+BuildRequires:	apache-devel >= 2
 Requires(post,preun):	%{apxs}
 Requires(post,preun):	grep
 Requires(preun):	fileutils
-Requires:	apache(EAPI)
-Provides:	mod_roaming
+Requires:	apache >= 2
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
-Obsoletes:	mod_roaming
+
+%define		_pkglibdir	%(%{apxs} -q LIBEXECDIR)
 
 %description
 With mod_roaming you can use your Apache web server as a Netscape
@@ -117,9 +116,9 @@ Netscape Communicator 4.5 som kan komma åt servern.
 
 %install
 rm -rf $RPM_BUILD_ROOT
-install -d $RPM_BUILD_ROOT{%{_libdir}/apache,%{_sysconfdir}/httpd,%{_var}/lib/mod_roaming}
+install -d $RPM_BUILD_ROOT{%{_pkglibdir},%{_sysconfdir}/httpd,%{_var}/lib/mod_roaming}
 
-install mod_%{mod_name}.so $RPM_BUILD_ROOT%{_libdir}/apache
+install mod_%{mod_name}.so $RPM_BUILD_ROOT%{_pkglibdir}
 install %{SOURCE1} $RPM_BUILD_ROOT%{_sysconfdir}/httpd/mod_roaming.conf
 
 %clean
@@ -149,6 +148,6 @@ fi
 %files
 %defattr(644,root,root,755)
 %doc CHANGES INSTALL LICENSE README
-%attr(755,root,root) %{_libdir}/apache/mod_roaming.so
+%attr(755,root,root) %{_pkglibdir}/mod_roaming.so
 %attr(660,root,http) %dir %{_var}/lib/mod_roaming
 %config(noreplace) %{_sysconfdir}/httpd/mod_roaming.conf
