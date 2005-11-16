@@ -112,13 +112,13 @@ Netscape Communicator 4.5 som kan komma åt servern.
 %setup -q -n mod_%{mod_name}-%{version}
 
 %build
-%{apxs} -c -o mod_roaming.so -lc mod_roaming.c
+%{apxs} -c -o mod_roaming.la mod_roaming.c
 
 %install
 rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT{%{_pkglibdir},%{_sysconfdir}/httpd,%{_var}/lib/mod_roaming}
 
-install mod_%{mod_name}.so $RPM_BUILD_ROOT%{_pkglibdir}
+install .libs/mod_roaming.so $RPM_BUILD_ROOT%{_pkglibdir}
 install %{SOURCE1} $RPM_BUILD_ROOT%{_sysconfdir}/httpd/mod_roaming.conf
 
 %clean
