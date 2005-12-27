@@ -23,13 +23,11 @@ Source1:	%{name}.conf
 URL:		http://www.klomp.org/mod_roaming/
 BuildRequires:	%{apxs}
 BuildRequires:	apache-devel >= 2.0.32
-Requires(post,preun):	%{apxs}
-Requires(post,preun):	grep
-Requires(preun):	fileutils
-Requires:	apache >= 2.0.32
+Requires:	apache(modules-api) = %apache_modules_api
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
-%define		_pkglibdir	%(%{apxs} -q LIBEXECDIR)
+%define		_pkglibdir	%(%{apxs} -q LIBEXECDIR 2>/dev/null)
+%define		_sysconfdir	%(%{apxs} -q SYSCONFDIR 2>/dev/null)
 
 %description
 With mod_roaming you can use your Apache web server as a Netscape
@@ -116,30 +114,21 @@ Netscape Communicator 4.5 som kan komma åt servern.
 
 %install
 rm -rf $RPM_BUILD_ROOT
-install -d $RPM_BUILD_ROOT{%{_pkglibdir},%{_sysconfdir}/httpd,%{_var}/lib/mod_roaming}
+install -d $RPM_BUILD_ROOT{%{_pkglibdir},%{_sysconfdir}/httpd.conf,%{_var}/lib/mod_roaming}
 
 install .libs/mod_roaming.so $RPM_BUILD_ROOT%{_pkglibdir}
-install %{SOURCE1} $RPM_BUILD_ROOT%{_sysconfdir}/httpd/mod_roaming.conf
+install %{SOURCE1} $RPM_BUILD_ROOT%{_sysconfdir}/httpd.conf/90_mod_%{mod_name}.conf
 
 %clean
 rm -rf $RPM_BUILD_ROOT
 
 %post
-%{apxs} -e -a -n %{mod_name} %{_pkglibdir}/mod_%{mod_name}.so 1>&2
-if [ -f /etc/httpd/httpd.conf ] && ! grep -q "^Include.*mod_%{mod_name}.conf" /etc/httpd/httpd.conf; then
-	echo "Include /etc/httpd/mod_%{mod_name}.conf" >> /etc/httpd/httpd.conf
-fi
 if [ -f /var/lock/subsys/httpd ]; then
 	/etc/rc.d/init.d/httpd restart 1>&2
 fi
 
 %preun
 if [ "$1" = "0" ]; then
-	%{apxs} -e -A -n %{mod_name} %{_pkglibdir}/mod_%{mod_name}.so 1>&2
-	umask 027
-	grep -v "^Include.*mod_%{mod_name}.conf" /etc/httpd/httpd.conf > \
-		/etc/httpd/httpd.conf.tmp
-	mv -f /etc/httpd/httpd.conf.tmp /etc/httpd/httpd.conf
 	if [ -f /var/lock/subsys/httpd ]; then
 		/etc/rc.d/init.d/httpd restart 1>&2
 	fi
@@ -148,6 +137,6 @@ fi
 %files
 %defattr(644,root,root,755)
 %doc CHANGES INSTALL LICENSE README
-%attr(755,root,root) %{_pkglibdir}/mod_roaming.so
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/httpd.conf/*_mod_%{mod_name}.conf
+%attr(755,root,root) %{_pkglibdir}/*.so
 %attr(660,root,http) %dir %{_var}/lib/mod_roaming
-%config(noreplace) %{_sysconfdir}/httpd/mod_roaming.conf
