@@ -21,7 +21,7 @@ Source0:	http://www.klomp.org/mod_roaming/mod_%{mod_name}-%{version}.tar.gz
 # Source0-md5:	ad2d720d7ffd08c4e7f2e6979795237e
 Source1:	%{name}.conf
 URL:		http://www.klomp.org/mod_roaming/
-BuildRequires:	apache-apxs >= 2.0.32
+BuildRequires:	%{apxs}
 BuildRequires:	apache-devel >= 2.0.32
 BuildRequires:	rpmbuild(macros) >= 1.268
 Requires:	apache(modules-api) = %apache_modules_api
