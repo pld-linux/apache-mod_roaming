@@ -16,7 +16,7 @@ Name:		apache-mod_%{mod_name}
 Version:	2.0.0
 Release:	1
 License:	BSD-like
-Group:		Networking/Daemons
+Group:		Networking/Daemons/HTTP
 Source0:	http://www.klomp.org/mod_roaming/mod_%{mod_name}-%{version}.tar.gz
 # Source0-md5:	ad2d720d7ffd08c4e7f2e6979795237e
 Source1:	%{name}.conf
